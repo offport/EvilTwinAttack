@@ -38,6 +38,10 @@ ifconfig wlan0 up 192.168.1.1 netmask 255.255.255.0
 # Add a route to the target network
 route add -net 192.168.1.0 netmask 255.255.255.0 gw 192.168.1.1
 
+# Execute this command to enable IP Forwarding:
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+
 # Configure NAT to allow traffic to pass through the interface
 iptables --table nat --append POSTROUTING --out-interface eth0 -j MASQUERADE
 iptables --append FORWARD --in-interface wlan0 -j ACCEPT
