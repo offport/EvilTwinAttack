@@ -49,9 +49,6 @@ iptables --append FORWARD --in-interface wlan0 -j ACCEPT
 # Redirect traffic to port 80 to the fake AP
 iptables -t nat -A PREROUTING -i wlan0 -p tcp --dport 80 -j DNAT --to-destination 192.168.1.1
 
-# Save the rules
-sudo service iptables save
-
 ``` 
 
 
